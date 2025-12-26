@@ -161,13 +161,6 @@ public class PushService {
         PushMessageHandler.didReceivePushMessageData(context, pushData);
     }
 
-    public static void destroy() {
-        if (INST.HMSClient != null) {
-            INST.HMSClient.disconnect();
-            INST.HMSClient = null;
-        }
-    }
-
     private boolean initXiaomi(Context context) {
 
         String packageName = context.getPackageName();
