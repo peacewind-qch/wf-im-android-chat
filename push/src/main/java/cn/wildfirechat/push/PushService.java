@@ -33,11 +33,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.heytap.mcssdk.PushManager;
 import com.heytap.mcssdk.callback.PushCallback;
 import com.heytap.mcssdk.mode.SubscribeResult;
-import com.hihonor.push.sdk.HonorPushClient;
-import com.huawei.agconnect.config.AGConnectServicesConfig;
-import com.huawei.hms.aaid.HmsInstanceId;
-import com.huawei.hms.api.HuaweiApiClient;
-import com.huawei.hms.common.ApiException;
 import com.meizu.cloud.pushsdk.util.MzSystemUtils;
 import com.vivo.push.IPushActionListener;
 import com.vivo.push.PushClient;
@@ -61,7 +56,6 @@ import cn.wildfirechat.remote.ChatManager;
  */
 
 public class PushService {
-    private HuaweiApiClient HMSClient;
     private boolean hasHMSToken;
     private int pushServiceType;
     private static PushService INST = new PushService();
@@ -83,13 +77,7 @@ public class PushService {
     public static void init(Application gContext, String applicationId) {
         PushService.applicationId = applicationId;
         String sys = getSystem();
-        if (SYS_EMUI.equals(sys)) {
-            INST.pushServiceType = PushServiceType.HMS;
-            INST.initHMS(gContext);
-        } else if (Build.MANUFACTURER.equals("HONOR") && HonorPushClient.getInstance().checkSupportHonorPush(gContext)) {
-            INST.pushServiceType = PushServiceType.Honor;
-            INST.initHonor(gContext);
-        } else if (/*SYS_FLYME.equals(sys) && INST.isMZConfigured(gContext)*/MzSystemUtils.isBrandMeizu()) {
+        if (/*SYS_FLYME.equals(sys) && INST.isMZConfigured(gContext)*/MzSystemUtils.isBrandMeizu()) {
             INST.pushServiceType = PushServiceType.MeiZu;
             INST.initMZ(gContext);
         } else if (SYS_VIVO.equalsIgnoreCase(sys)) {
@@ -229,25 +217,8 @@ public class PushService {
         return false;
     }
 
-    private void initHMS(final Context context) {
-        String appId = AGConnectServicesConfig.fromContext(context).getString("client/app_id");
-        ChatManager.Instance().getWorkHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String token = HmsInstanceId.getInstance(context).getToken(appId, "HCM");
-                    if (!TextUtils.isEmpty(token)) {
-                        ChatManager.Instance().setDeviceToken(token, PushServiceType.HMS);
-                    }
-                } catch (ApiException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     private void initHonor(final Context context) {
-        HonorPushClient.getInstance().init(context, true);
+
     }
 
     private boolean isMZConfigured(Context context) {
